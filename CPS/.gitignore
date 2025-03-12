@@ -1,1 +1,3 @@
-ECHO is on.
+**/.idea/
+**/.venv/
+**/__pycache__/
