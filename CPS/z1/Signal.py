@@ -1,7 +1,9 @@
+import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 from abc import ABC, abstractmethod
 import random
+matplotlib.use('TkAgg')
 
 
 class Signal(ABC):
@@ -13,20 +15,38 @@ class Signal(ABC):
         self.n1 = int(self.t1 * self.f)
         self.t2 = self.t1 + self.d
         self.n2 = int(self.t2 * self.f)
-        self.n = 0
         self.t = []
         self.y = []
 
     def generate_t(self):
-        # n2 - n1 = t2f - t1f = (t1 - t2) * f
-        self.t = np.linspace(self.t1, self.t2, (self.n2 - self.n1) * 100)
+        self.t = np.linspace(self.t1, self.t2, (self.n2 - self.n1 + 1) * 100)
 
     @abstractmethod
     def generate_signal(self):
         pass
 
     def avg_value(self):
-        return 1 / (self.n2 - self.n1) * sum(self.y)
+        return 'Wartość średnia: ', np.sum(self.y) / len(self.t)
+
+    def abs_avg_value(self):
+        y = [abs(x) for x in self.y]
+        return 'Wartość średnia bezwzględna: ', np.sum(y) / len(self.t)
+
+    def avg_power(self):
+        y = [x ** 2 for x in self.y]
+        return 'Moc średnia: ', np.sum(y) / len(self.t)
+
+    def variance(self):
+        avg = self.avg_value()
+        y = [(x - avg[1]) ** 2 for x in self.y]
+        return 'Wariancja: ', np.sum(y) / len(self.t)
+
+    def root_mean_square(self):
+        y = [x ** 2 for x in self.y]
+        return 'Wartość skuteczna: ', (np.sum(y) / len(self.t)) ** 0.5,
+
+    def signal_params(self):
+        return [self.avg_value(), self.abs_avg_value(), self.avg_power(), self.variance(), self.root_mean_square()]
 
     def plot_signal(self):
         plt.plot(self.t, self.y)
@@ -35,6 +55,17 @@ class Signal(ABC):
         plt.ylabel('Amplituda[A]')
         plt.grid(True)
         plt.show()
+
+    def histogram_signal(self, bins=50):
+        plt.hist(self.y, bins=bins, edgecolor='black')
+        plt.title(f'{self}')
+        plt.xlabel('Amplituda [A]')
+        plt.ylabel('Liczba próbek')
+        plt.grid(True)
+        plt.show()
+
+    def __add__(self, other):
+        pass
 
     def __repr__(self):
         return 'Sygnał'
@@ -173,7 +204,6 @@ class UniformlyDistributedNoise(Signal):
         return 'Szum o rozkładzie jednostajnym'
 
 
-# napisac funkcje rozkladu gaussa bo tera to mi sie nei chce
 class GaussianNoise(Signal):
     def generate_signal(self):
         self.generate_t()
@@ -190,9 +220,6 @@ class DiscreteSignal(Signal, ABC):
     def generate_t(self):
         self.t = np.linspace(self.n1, self.n2, self.n2 - self.n1 + 1)
 
-    def avg_value(self):
-        return 1 / (self.n2 - self.n1) * sum(self.y)
-
     def plot_signal(self):
         plt.scatter(self.t, self.y)
         plt.title(f'{self}')
@@ -200,9 +227,6 @@ class DiscreteSignal(Signal, ABC):
         plt.ylabel('Amplituda[A]')
         plt.grid(True)
         plt.show()
-
-    def avg_value(self):
-        pass
 
 
 class UnitImpulse(DiscreteSignal):

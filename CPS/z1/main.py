@@ -1,37 +1,92 @@
+import os
+import pickle
+from tkinter import filedialog, Tk
 import Signal
 import inspect
 
-signal = None
+signal1 = None
+signal2 = None
 
 
 def generate_signal(signal_class):
     signature = inspect.signature(signal_class.__init__)
     params = signature.parameters
     params = [param for param in params if param != 'self']
-    global signal
+    global signal1
     try:
         values = []
         for param in params:
             values.append(float(input(f'{param}: ')))
-        signal = signal_class(*values)
-        signal.generate_t()
-        signal.generate_signal()
-        print('Sygnał wygenerowany pomyślnie\n')
+        signal1 = signal_class(*values)
+        signal1.generate_t()
+        signal1.generate_signal()
+        results = signal1.signal_params()
+        for result in results:
+            print(result[0], result[1])
+        print('Sygnał wygenerowano pomyślnie\n')
     except ValueError:
         print('Błędny format danych\n')
 
 
 def generate_plot():
     try:
-        global signal
-        signal.plot_signal()
+        global signal1
+        signal1.plot_signal()
         print('Wykres wygenerowany pomyślnie\n')
     except AttributeError:
         print("Musisz najpierw wygenerować sygnał\n")
 
 
 def generate_histogram():
-    pass
+    try:
+        global signal1
+        signal1.histogram_signal()
+        print('Histogram wygenerowany pomyślnie\n')
+    except AttributeError:
+        print("Musisz najpierw wygenerować sygnał\n")
+
+
+def write():
+    global signal1
+    root = Tk()
+    root.withdraw()
+    root.lift()
+    root.attributes('-topmost', 1)
+
+    filepath = filedialog.asksaveasfilename(
+        initialdir=os.getcwd() + '/files/',
+        defaultextension=".pkl",
+        filetypes=[("Pickle Files", "*.pkl")],
+        initialfile=f"{signal1}.pkl",
+    )
+
+    try:
+        if filepath:
+            if not filepath.endswith(".pkl"):
+                filepath += ".pkl"
+
+            with open(filepath, 'wb') as f:
+                pickle.dump(signal1, f)
+                print(f"Obiekt zapisany w: {filepath}")
+    except IOError as e:
+        print(f'Błąd zapisu {e}')
+
+
+def read():
+    global signal2
+    root = Tk()
+    root.withdraw()
+    root.lift()
+    root.attributes('-topmost', 1)
+
+    filepath = filedialog.askopenfilename(initialdir=os.getcwd() + '/files/', filetypes=[("Pickle Files", "*.pkl")])
+    try:
+        if filepath:
+            with open(filepath, 'rb') as f:
+                signal2 = pickle.load(f)
+                print(f"Załadowany obiekt: {signal1}")
+    except FileNotFoundError as e:
+        print(f'Taki plik nie istnieje {e}')
 
 
 variants = {
@@ -48,9 +103,14 @@ variants = {
     'Szum impulsowy': (generate_signal, Signal.ImpulseNoise)
 }
 
-io = ['Zapisz', 'Wczytaj']
+io = {'Zapisz': write,
+      'Wczytaj': read
+      }
 
-operations = ['Dodawanie', 'Odejmowanie', 'Mnożenie', 'Dzielenie']
+operations = {'Dodawanie',
+              'Odejmowanie',
+              'Mnożenie',
+              'Dzielenie'}
 
 graphs = {'Wykres': generate_plot, 'Histogram': generate_histogram}
 
@@ -58,7 +118,8 @@ modes = {'Generuj sygnał lub szum': variants,
          'Zapis lub odczyt': io,
          'Podstawowe działania na sygnałach': operations,
          'Reprezentacja graficzna': graphs,
-         'Zakończ': None}
+         'Zakończ': None
+         }
 
 if __name__ == '__main__':
     while True:
