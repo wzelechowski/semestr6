@@ -65,8 +65,56 @@ class Signal(ABC):
         plt.show()
 
     def __add__(self, other):
-        pass
+        eps = 1e-2
+        t = np.unique(np.concatenate((self.t, other.t)))
+        y = []
 
+        for val in t:
+            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < eps), 0)
+            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < eps), 0)
+            y.append(y1 + y2)
+
+        self.t = t
+        self.y = y
+
+    def __sub__(self, other):
+        eps = 1e-2
+        t = np.unique(np.concatenate((self.t, other.t)))
+        y = []
+
+        for val in t:
+            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < eps), 0)
+            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < eps), 0)
+            y.append(y1 - y2)
+
+        self.t = t
+        self.y = y
+
+    def __mul__(self, other):
+        eps = 1e-2
+        t = np.unique(np.concatenate((self.t, other.t)))
+        y = []
+
+        for val in t:
+            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < eps), 0)
+            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < eps), 0)
+            y.append(y1 * y2)
+
+        self.t = t
+        self.y = y
+
+    def __truediv__(self, other):
+        eps = 1e-2
+        t = np.unique(np.concatenate((self.t, other.t)))
+        y = []
+
+        for val in t:
+            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < eps), 0)
+            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < eps), 0)
+            y.append(y1 / y2)
+
+        self.t = t
+        self.y = y
     def __repr__(self):
         return 'Sygnał'
 

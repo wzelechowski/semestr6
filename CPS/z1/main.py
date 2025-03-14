@@ -47,7 +47,6 @@ def generate_histogram():
 
 
 def write():
-    global signal1
     root = Tk()
     root.withdraw()
     root.lift()
@@ -67,7 +66,7 @@ def write():
 
             with open(filepath, 'wb') as f:
                 pickle.dump(signal1, f)
-                print(f"Obiekt zapisany w: {filepath}")
+                print(f"Obiekt zapisany w: {filepath}\n")
     except IOError as e:
         print(f'Błąd zapisu {e}')
 
@@ -84,9 +83,14 @@ def read():
         if filepath:
             with open(filepath, 'rb') as f:
                 signal2 = pickle.load(f)
-                print(f"Załadowany obiekt: {signal1}")
+                print(f"Załadowany obiekt: {signal2}\n")
     except FileNotFoundError as e:
         print(f'Taki plik nie istnieje {e}')
+
+
+def add_signals():
+    global signal1
+    _ = signal1 + signal2
 
 
 variants = {
@@ -100,19 +104,20 @@ variants = {
     'Sygnał trójkątny': (generate_signal, Signal.TriangleSignal),
     'Skok jednostkowy': (generate_signal, Signal.UnitJump),
     'Impuls jednostkowy': (generate_signal, Signal.UnitImpulse),
-    'Szum impulsowy': (generate_signal, Signal.ImpulseNoise)
+    'Szum impulsowy': (generate_signal, Signal.ImpulseNoise),
+    'Powrót': None
 }
 
-io = {'Zapisz': write,
-      'Wczytaj': read
-      }
+io = {'Zapisz': write, 'Wczytaj': read, 'Powrót': None}
 
-operations = {'Dodawanie',
-              'Odejmowanie',
-              'Mnożenie',
-              'Dzielenie'}
+operations = {'Dodawanie': lambda: signal1 + signal2,
+              'Odejmowanie': lambda: signal1 - signal2,
+              'Mnożenie': lambda: signal1 * signal2,
+              'Dzielenie': lambda: signal1 / signal2,
+              'Powrót': None
+              }
 
-graphs = {'Wykres': generate_plot, 'Histogram': generate_histogram}
+graphs = {'Wykres': generate_plot, 'Histogram': generate_histogram, 'Powrót': None}
 
 modes = {'Generuj sygnał lub szum': variants,
          'Zapis lub odczyt': io,
@@ -157,8 +162,11 @@ if __name__ == '__main__':
 
         selected_option = list(options.keys())[option_number - 1]
         option = options[selected_option]
-        if type(option) is tuple:
-            f, x = option
-            f(x)
-        else:
-            option()
+        try:
+            if type(option) is tuple:
+                f, x = option
+                f(x)
+            else:
+                option()
+        except TypeError as e:
+            print('')
