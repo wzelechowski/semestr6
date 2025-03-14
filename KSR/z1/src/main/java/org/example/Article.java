@@ -8,7 +8,7 @@ public class Article {
     private final String place;
 
     public Article(String body, String country) {
-        this.body = Arrays.asList(body.replaceAll("[^a-zA-Z ]", "").trim().split("\\s+"));
+        this.body = Arrays.asList(body.replaceAll("[^a-zA-Z0-9 ]", "").trim().split("\\s+"));
         this.place = country;
     }
 

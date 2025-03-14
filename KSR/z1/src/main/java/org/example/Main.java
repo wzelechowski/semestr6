@@ -12,14 +12,21 @@ public class Main {
         //List<String>
         //Reader r = new Reader("src/main/resources");
 //        int count = 0;
-//        for (Article a : Reader.read("src/main/resources")) {
-//           System.out.println(a.getCountry() + "\n" + a.getBody());
+        FeaturesExtractor fe = new FeaturesExtractor();
+        for (Article a : Reader.read("src/main/resources/reuters")) {
+            if(fe.findFirsCountry(a) != null) {
+                System.out.println(a.getCountry() + "\n" + a.getBody());
+               // System.out.println(fe.countCountries(a));
+                System.out.println(fe.findFirsCountry(a));
+            }
+           //System.out.println(a.getCountry() + "\n" + a.getBody());
+            //System.out.println(a.getBody());
 //            count ++;
-//        }
+        }
 //        System.out.println(count);
-        System.out.println(Reader.read("src/main/resources").get(0).getCountry() + "\n" + Reader.read("src/main/resources").get(0).getBody());
+        //System.out.println(Reader.read("src/main/resources").get(0).getCountry() + "\n" + Reader.read("src/main/resources").get(0).getBody());
         //FeaturesExtractor feature = new FeaturesExtractor();
-        System.out.println(FeaturesExtractor.countWords(Reader.read("src/main/resources").get(0)));
+        //System.out.println(FeaturesExtractor.findFirsCountry(Reader.read("src/main/resources").get(0)));
 //        r.read("reut2-002.sgm");
     }
 }

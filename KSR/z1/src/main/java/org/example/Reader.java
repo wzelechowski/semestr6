@@ -62,5 +62,5 @@ public class Reader {
        // System.out.println(count);
         return articles;
     }
-    
+
 }
