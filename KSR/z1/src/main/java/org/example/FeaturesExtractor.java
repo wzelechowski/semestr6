@@ -67,6 +67,27 @@ public class FeaturesExtractor {
 //        return null;
     }
 
+    public int countNonUniqueCountries(Article article) {
+        int counter = 0;
+        int numOfWords = article.getBody().size();
+
+        for (int i = 0; i < numOfWords; i++) {
+            for (int j = i + 1; j <= numOfWords; j++) {
+                if (j > i + 3) {
+                    break;
+                }
+                String maybeCountry = String.join(" ", article.getBody().subList(i, j));
+                if (this.countries.contains(maybeCountry)) {
+                    //System.out.println(standardNameCountry(maybeCountry));
+                    counter++;
+                    i = j - 1;
+                    break;
+                }
+            }
+        }
+        return counter;
+    }
+
     public int countUniqueCountries(Article article) {
         List<String> uniqueCountries = new ArrayList<>();
         //int counter = 0;
@@ -162,23 +183,13 @@ public class FeaturesExtractor {
             }
         }
 
-        int numOfWords = article.getBody().size();
-        for (int i = 0; i < numOfWords; i++) {
-            for (int j = i + 1; j <= numOfWords; j++) {
-                if (j > i + 3) {
-                    break;
-                }
-                String maybeCountry = String.join(" ", article.getBody().subList(i, j));
-                if (this.countries.contains(maybeCountry)) {
-                    //System.out.println(maybeCountry);
-                    counter++;
-                    i = j - 1;
-                    break;
-                }
-            }
-        }
+        counter += countNonUniqueCountries(article);
 
         return counter;
+    }
+
+    public double countRelativeCountry(Article article) {
+        return (double) countNonUniqueCountries(article) / article.getBody().size();
     }
 
     private void loadCountriesFromFile() throws IOException {

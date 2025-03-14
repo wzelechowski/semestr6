@@ -17,7 +17,10 @@ public class Main {
             if(fe.findFirsCountry(a) != null) {
                 System.out.println(a.getCountry() + "\n" + a.getBody());
                // System.out.println(fe.countCountries(a));
+                System.out.println(fe.countNonUniqueCountries(a));
+                System.out.println(fe.countUniqueCountries(a));
                 System.out.println(fe.countCountriesAndCurrencies(a));
+                System.out.println(fe.countRelativeCountry(a));
             }
            //System.out.println(a.getCountry() + "\n" + a.getBody());
             //System.out.println(a.getBody());
