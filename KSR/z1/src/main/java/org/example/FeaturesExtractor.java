@@ -152,6 +152,35 @@ public class FeaturesExtractor {
         return null;
     }
 
+    public int countCountriesAndCurrencies(Article article) {
+        int counter = 0;
+
+        for (String word : article.getBody()) {
+            if (this.currencies.contains(word.toLowerCase())) {
+                //System.out.println(word);
+                counter++;
+            }
+        }
+
+        int numOfWords = article.getBody().size();
+        for (int i = 0; i < numOfWords; i++) {
+            for (int j = i + 1; j <= numOfWords; j++) {
+                if (j > i + 3) {
+                    break;
+                }
+                String maybeCountry = String.join(" ", article.getBody().subList(i, j));
+                if (this.countries.contains(maybeCountry)) {
+                    //System.out.println(maybeCountry);
+                    counter++;
+                    i = j - 1;
+                    break;
+                }
+            }
+        }
+
+        return counter;
+    }
+
     private void loadCountriesFromFile() throws IOException {
         this.countries = new ArrayList<>();
         try {
