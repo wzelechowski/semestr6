@@ -67,7 +67,7 @@ public class FeaturesExtractor {
 //        return null;
     }
 
-    public int countCountries(Article article) {
+    public int countUniqueCountries(Article article) {
         List<String> uniqueCountries = new ArrayList<>();
         //int counter = 0;
         int numOfWords = article.getBody().size();
