@@ -2,10 +2,8 @@ package org.example;
 
 import org.jsoup.Jsoup;
 import java.io.File;
-import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,18 +12,21 @@ import java.util.Objects;
 
 
 public class Reader {
-    private final File[] files;
 
-    public Reader(String articlesPat) throws IOException {
-        File file = new File(articlesPat);
-        this.files = file.listFiles();
+    private Reader() {
     }
 
     //TERAZ WCZYTUJE DO BODY CALY TEKST ŁĄCZNIE Z TYTUŁEM I DATĄ ŻEBY WCZYTYWAĆ TYLKO BODY TO ODKOMENTOWAĆ BODY Z .HTML(), INDEX I IF ELSE A ZAKOMENTOWAĆ BODY Z TEXT()
-    public List<Article> read() throws IOException {
+    public static List<Article> read(String path) throws IOException {
+        File[] files = new File(path).listFiles();
+
+        if(files == null) {
+            return null;
+        }
+
         List<Document> documents = new ArrayList<>();
 
-        for (File file : this.files) {
+        for (File file : files) {
             documents.add(Jsoup.parse(file, "UTF-8", ""));
         }
 
@@ -52,7 +53,7 @@ public class Reader {
 //                }
                 String places = element.select("PLACES").select("D").text();
                 Article article = new Article(body, places);
-                if (!Objects.equals(article.getBody().get(0), "******") && article.getCountry().matches("west-germany|usa|france|uk|canada|japan")) {
+                if (article.getCountry().matches("west-germany|usa|france|uk|canada|japan") && !Objects.equals(article.getBody().get(0), "******")) {
                     articles.add(article);
                     //count++;
                 }
@@ -61,6 +62,5 @@ public class Reader {
        // System.out.println(count);
         return articles;
     }
-
-
+    
 }
