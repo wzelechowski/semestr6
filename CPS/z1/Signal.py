@@ -17,6 +17,7 @@ class Signal(ABC):
         self.n2 = int(self.t2 * self.f)
         self.t = []
         self.y = []
+        self.eps = 1e-2
 
     def generate_t(self):
         self.t = np.linspace(self.t1, self.t2, (self.n2 - self.n1 + 1) * 100)
@@ -64,57 +65,68 @@ class Signal(ABC):
         plt.grid(True)
         plt.show()
 
+    def merge_signals(self, other):
+        try:
+            t1 = min(self.t1, other.t1)
+            t2 = max(self.t2, other.t2)
+            n1 = min(self.t1, other.n1)
+            n2 = max(self.t2, other.n2)
+            return t1, t2, n1, n2
+        except (AttributeError, TypeError):
+            print('Musisz wygenerować oraz wczytać sygnał\n')
+
     def __add__(self, other):
-        eps = 1e-2
-        t = np.unique(np.concatenate((self.t, other.t)))
+        t1, t2, n1, n2 = self.merge_signals(other)
+        t = np.linspace(t1, t2, int((n2 - n1 + 1) * 100))
         y = []
 
         for val in t:
-            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < eps), 0)
-            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < eps), 0)
+            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < self.eps), 0)
+            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < self.eps), 0)
             y.append(y1 + y2)
 
         self.t = t
         self.y = y
 
     def __sub__(self, other):
-        eps = 1e-2
-        t = np.unique(np.concatenate((self.t, other.t)))
+        t1, t2, n1, n2 = self.merge_signals(other)
+        t = np.linspace(t1, t2, int((n2 - n1 + 1) * 1000))
         y = []
 
         for val in t:
-            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < eps), 0)
-            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < eps), 0)
+            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < self.eps), 0)
+            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < self.eps), 0)
             y.append(y1 - y2)
 
         self.t = t
         self.y = y
 
     def __mul__(self, other):
-        eps = 1e-2
-        t = np.unique(np.concatenate((self.t, other.t)))
+        t1, t2, n1, n2 = self.merge_signals(other)
+        t = np.linspace(t1, t2, int((n2 - n1 + 1) * 100))
         y = []
 
         for val in t:
-            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < eps), 0)
-            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < eps), 0)
+            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < self.eps), 0)
+            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < self.eps), 0)
             y.append(y1 * y2)
 
         self.t = t
         self.y = y
 
     def __truediv__(self, other):
-        eps = 1e-2
-        t = np.unique(np.concatenate((self.t, other.t)))
+        t1, t2, n1, n2 = self.merge_signals(other)
+        t = np.linspace(t1, t2, int((n2 - n1 + 1) * 100))
         y = []
 
         for val in t:
-            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < eps), 0)
-            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < eps), 0)
+            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < self.eps), 0)
+            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < self.eps), 0)
             y.append(y1 / y2)
 
         self.t = t
         self.y = y
+
     def __repr__(self):
         return 'Sygnał'
 

@@ -29,8 +29,8 @@ def generate_signal(signal_class):
 
 
 def generate_plot():
+    global signal1
     try:
-        global signal1
         signal1.plot_signal()
         print('Wykres wygenerowany pomyślnie\n')
     except AttributeError:
@@ -38,8 +38,8 @@ def generate_plot():
 
 
 def generate_histogram():
+    global signal1
     try:
-        global signal1
         signal1.histogram_signal()
         print('Histogram wygenerowany pomyślnie\n')
     except AttributeError:
@@ -88,11 +88,6 @@ def read():
         print(f'Taki plik nie istnieje {e}')
 
 
-def add_signals():
-    global signal1
-    _ = signal1 + signal2
-
-
 variants = {
     'Szum o rozkładzie jednostajnym': (generate_signal, Signal.UniformlyDistributedNoise),
     'Szum gaussowski': (generate_signal, Signal.GaussianNoise),
@@ -115,7 +110,7 @@ operations = {'Dodawanie': lambda: signal1 + signal2,
               'Mnożenie': lambda: signal1 * signal2,
               'Dzielenie': lambda: signal1 / signal2,
               'Powrót': None
-              }
+}
 
 graphs = {'Wykres': generate_plot, 'Histogram': generate_histogram, 'Powrót': None}
 
@@ -124,7 +119,7 @@ modes = {'Generuj sygnał lub szum': variants,
          'Podstawowe działania na sygnałach': operations,
          'Reprezentacja graficzna': graphs,
          'Zakończ': None
-         }
+}
 
 if __name__ == '__main__':
     while True:
@@ -168,5 +163,5 @@ if __name__ == '__main__':
                 f(x)
             else:
                 option()
-        except TypeError as e:
-            print('')
+        except (AttributeError, TypeError) as e:
+            print(e)
