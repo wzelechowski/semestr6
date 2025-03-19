@@ -17,10 +17,10 @@ class Signal(ABC):
         self.n2 = int(self.t2 * self.f)
         self.t = []
         self.y = []
-        self.eps = 1e-2
+        self.eps = 1e-3
 
     def generate_t(self):
-        self.t = np.linspace(self.t1, self.t2, (self.n2 - self.n1 + 1) * 100)
+        self.t = np.linspace(self.t1, self.t2, (self.n2 - self.n1 + 1) * 1000)
 
     @abstractmethod
     def generate_signal(self):
@@ -65,64 +65,42 @@ class Signal(ABC):
         plt.grid(True)
         plt.show()
 
-    def merge_signals(self, other):
-        try:
-            t1 = min(self.t1, other.t1)
-            t2 = max(self.t2, other.t2)
-            n1 = min(self.t1, other.n1)
-            n2 = max(self.t2, other.n2)
-            return t1, t2, n1, n2
-        except (AttributeError, TypeError):
-            print('Musisz wygenerować oraz wczytać sygnał\n')
-
     def __add__(self, other):
-        t1, t2, n1, n2 = self.merge_signals(other)
-        t = np.linspace(t1, t2, int((n2 - n1 + 1) * 100))
-        y = []
-
-        for val in t:
-            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < self.eps), 0)
-            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < self.eps), 0)
-            y.append(y1 + y2)
+        t = np.sort(np.union1d(self.t, other.t))
+        y1 = np.interp(t, self.t, self.y, left=0, right=0)
+        y2 = np.interp(t, other.t, other.y, left=0, right=0)
+        y = np.where(np.abs(y1 + y2) < self.eps, 0, y1 + y2)
 
         self.t = t
         self.y = y
 
     def __sub__(self, other):
-        t1, t2, n1, n2 = self.merge_signals(other)
-        t = np.linspace(t1, t2, int((n2 - n1 + 1) * 1000))
-        y = []
-
-        for val in t:
-            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < self.eps), 0)
-            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < self.eps), 0)
-            y.append(y1 - y2)
+        t = np.sort(np.union1d(self.t, other.t))
+        y1 = np.interp(t, self.t, self.y, left=0, right=0)
+        y2 = np.interp(t, other.t, other.y, left=0, right=0)
+        y = np.where(np.abs(y1 - y2) < self.eps, 0, y1 - y2)
 
         self.t = t
         self.y = y
 
     def __mul__(self, other):
-        t1, t2, n1, n2 = self.merge_signals(other)
-        t = np.linspace(t1, t2, int((n2 - n1 + 1) * 100))
-        y = []
-
-        for val in t:
-            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < self.eps), 0)
-            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < self.eps), 0)
-            y.append(y1 * y2)
+        t = np.sort(np.union1d(self.t, other.t))
+        y1 = np.interp(t, self.t, self.y, left=0, right=0)
+        y2 = np.interp(t, other.t, other.y, left=0, right=0)
+        y1 = np.where((y1 == 0) & (y2 != 0), 1, y1)
+        y2 = np.where((y2 == 0) & (y1 != 0), 1, y2)
+        y = np.where(np.abs(y1 * y2) < self.eps, 0, y1 * y2)
 
         self.t = t
         self.y = y
 
     def __truediv__(self, other):
-        t1, t2, n1, n2 = self.merge_signals(other)
-        t = np.linspace(t1, t2, int((n2 - n1 + 1) * 100))
-        y = []
-
-        for val in t:
-            y1 = next((yi for ti, yi in zip(self.t, self.y) if abs(ti - val) < self.eps), 0)
-            y2 = next((yi for ti, yi in zip(other.t, other.y) if abs(ti - val) < self.eps), 0)
-            y.append(y1 / y2)
+        t = np.sort(np.union1d(self.t, other.t))
+        y1 = np.interp(t, self.t, self.y, left=0, right=0)
+        y2 = np.interp(t, other.t, other.y, left=0, right=0)
+        y1 = np.where(y1 == 0, 1, y1)
+        y2 = np.where(y2 == 0, 1, y2)
+        y = np.round(np.where(np.abs(y1 / y2) < self.eps, 0, y1 / y2), 2)
 
         self.t = t
         self.y = y
@@ -188,7 +166,7 @@ class SquareSignal(Signal):
             k = int((t - self.t1) / self.T)
             if k * self.T + self.t1 <= t < self.kw * self.T + k * self.T + self.t1:
                 self.y.append(self.A)
-            elif self.kw * self.T - self.t1 <= t < self.T + k * self.T + self.t1:
+            elif self.kw * self.T - k * self.T + self.t1 <= t < self.T + k * self.T + self.t1:
                 self.y.append(0)
 
     def __repr__(self):
@@ -208,7 +186,7 @@ class SquareSimetricalSignal(Signal):
             k = int((t - self.t1) / self.T)
             if k * self.T + self.t1 <= t < self.kw * self.T + k * self.T + self.t1:
                 self.y.append(self.A)
-            elif self.kw * self.T + self.t1 <= t < self.T + k * self.T + self.t1:
+            elif self.kw * self.T + self.t1 + k * self.T <= t < self.T + k * self.T + self.t1:
                 self.y.append(self.A * (-1))
 
     def __repr__(self):
@@ -298,9 +276,9 @@ class UnitImpulse(DiscreteSignal):
         self.generate_t()
         for t in self.t:
             if np.floor(t - self.ns) == 0:
-                self.y.append(self.A)
+                self.y.append(float(self.A))
             else:
-                self.y.append(0)
+                self.y.append(0.0)
 
     def __repr__(self):
         return 'Impuls jednostkowy'

@@ -28,24 +28,6 @@ def generate_signal(signal_class):
         print('Błędny format danych\n')
 
 
-def generate_plot():
-    global signal1
-    try:
-        signal1.plot_signal()
-        print('Wykres wygenerowany pomyślnie\n')
-    except AttributeError:
-        print("Musisz najpierw wygenerować sygnał\n")
-
-
-def generate_histogram():
-    global signal1
-    try:
-        signal1.histogram_signal()
-        print('Histogram wygenerowany pomyślnie\n')
-    except AttributeError:
-        print("Musisz najpierw wygenerować sygnał\n")
-
-
 def write():
     root = Tk()
     root.withdraw()
@@ -112,7 +94,7 @@ operations = {'Dodawanie': lambda: signal1 + signal2,
               'Powrót': None
 }
 
-graphs = {'Wykres': generate_plot, 'Histogram': generate_histogram, 'Powrót': None}
+graphs = {'Wykres': lambda: signal1.plot_signal(), 'Histogram': lambda: signal1.histogram_signal(), 'Powrót': None}
 
 modes = {'Generuj sygnał lub szum': variants,
          'Zapis lub odczyt': io,
@@ -158,10 +140,10 @@ if __name__ == '__main__':
         selected_option = list(options.keys())[option_number - 1]
         option = options[selected_option]
         try:
-            if type(option) is tuple:
+            if isinstance(option, tuple):
                 f, x = option
                 f(x)
             else:
                 option()
         except (AttributeError, TypeError) as e:
-            print(e)
+            print(f'{e}\n')
