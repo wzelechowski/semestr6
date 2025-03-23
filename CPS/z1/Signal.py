@@ -1,3 +1,5 @@
+import inspect
+
 import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,6 +27,11 @@ class Signal(ABC):
     @abstractmethod
     def generate_signal(self):
         pass
+
+    def exec_signal(self):
+        self.generate_t()
+        self.generate_signal()
+        return self.signal_params()
 
     def avg_value(self):
         return 'Wartość średnia: ', np.sum(self.y) / len(self.t)

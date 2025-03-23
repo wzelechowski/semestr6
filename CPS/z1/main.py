@@ -3,6 +3,16 @@ import pickle
 from tkinter import filedialog, Tk
 import Signal
 import inspect
+from PyQt5.QtWidgets import QApplication
+import sys
+import MainWindow
+
+
+def main():
+    app = QApplication(sys.argv)
+    window = MainWindow.MainWindow()
+    window.show()
+    sys.exit(app.exec_())
 
 signal1 = None
 signal2 = None
@@ -104,46 +114,47 @@ modes = {'Generuj sygnał lub szum': variants,
 }
 
 if __name__ == '__main__':
-    while True:
-        for index, mode in enumerate(modes, 1):
-            print(f'{index}. {mode}')
-
-        mode_number = None
-        while True:
-            try:
-                mode_number = int(input('Podaj numer: '))
-                if 1 <= mode_number <= len(modes):
-                    break
-                else:
-                    raise ValueError('Błędny numer\n')
-            except ValueError as e:
-                print(f'{e}\n')
-
-        if mode_number == 5:
-            break
-        selected_mode = list(modes.keys())[mode_number - 1]
-        options = modes[selected_mode]
-
-        for index, option in enumerate(options, 1):
-            print(f'{index}: {option}')
-
-        while True:
-            try:
-                option_number = int(input('Podaj numer: '))
-                if 1 <= option_number <= len(options):
-                    break
-                else:
-                    raise ValueError('Błędny numer\n')
-            except ValueError as e:
-                print(f'{e}\n')
-
-        selected_option = list(options.keys())[option_number - 1]
-        option = options[selected_option]
-        try:
-            if isinstance(option, tuple):
-                f, x = option
-                f(x)
-            else:
-                option()
-        except (AttributeError, TypeError) as e:
-            print(f'{e}\n')
+    main()
+    # while True:
+    #     for index, mode in enumerate(modes, 1):
+    #         print(f'{index}. {mode}')
+    #
+    #     mode_number = None
+    #     while True:
+    #         try:
+    #             mode_number = int(input('Podaj numer: '))
+    #             if 1 <= mode_number <= len(modes):
+    #                 break
+    #             else:
+    #                 raise ValueError('Błędny numer\n')
+    #         except ValueError as e:
+    #             print(f'{e}\n')
+    #
+    #     if mode_number == 5:
+    #         break
+    #     selected_mode = list(modes.keys())[mode_number - 1]
+    #     options = modes[selected_mode]
+    #
+    #     for index, option in enumerate(options, 1):
+    #         print(f'{index}: {option}')
+    #
+    #     while True:
+    #         try:
+    #             option_number = int(input('Podaj numer: '))
+    #             if 1 <= option_number <= len(options):
+    #                 break
+    #             else:
+    #                 raise ValueError('Błędny numer\n')
+    #         except ValueError as e:
+    #             print(f'{e}\n')
+    #
+    #     selected_option = list(options.keys())[option_number - 1]
+    #     option = options[selected_option]
+    #     try:
+    #         if isinstance(option, tuple):
+    #             f, x = option
+    #             f(x)
+    #         else:
+    #             option()
+    #     except (AttributeError, TypeError) as e:
+    #         print(f'{e}\n')
