@@ -2,20 +2,16 @@ import os
 import pickle
 from copy import deepcopy
 
-from PIL.ImageOps import expand
-from PyQt5.QtCore import Qt
 
 import Signal
 import inspect
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGridLayout, \
     QComboBox, QLineEdit, QFileDialog, QStackedWidget, QTabWidget, QListWidget, QSlider
 from PyQt5.QtWidgets import QPushButton
-import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QStackedWidget, QLabel
 from PyQt5.QtCore import Qt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
 
 class MainWindow(QMainWindow):
     def __init__(self):
